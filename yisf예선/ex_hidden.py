@@ -1,0 +1,50 @@
+from sympy import *
+from pwn import *
+import math
+
+def ret(mx,my,m2x,m2y):
+	output=sqrt(pow(m2x-mx,2)+pow(m2y-my,2))
+	return output
+
+r=remote('218.158.141.199',24763)
+r.recvuntil('Step : 1')
+for i in range(1,101):
+	r.recvuntil('Step :  '+str(i)+'\n')
+	r.recvuntil('\n')
+	x1=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('+ ')
+	y1=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('y = ')
+	result1=int(r.recvuntil('\n').replace('\n',''))
+	log.info(str(x1)+','+str(y1)+','+str(result1))
+	x2=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('+ ')
+	y2=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('y = ')
+	result2=int(r.recvuntil('\n').replace('\n',''))
+	log.info(str(x2)+','+str(y2)+','+str(result2))
+	x3=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('+ ')
+	y3=int(r.recvuntil(' ').replace(' ',''))
+	r.recvuntil('y = ')
+	result3=int(r.recvuntil('\n').replace('\n',''))
+	log.info(str(x3)+','+str(y3)+','+str(result3))
+	x=Symbol('x')
+	y=Symbol('y')
+	eq1=(x1*x)+(y1*y)-(result1)
+	eq2=(x2*x)+(y2*y)-(result2)
+	eq3=(x3*x)+(y3*y)-(result3)
+	log.info(eq1)
+	log.info(eq2)
+	log.info(eq3)
+	m1=solve((eq1,eq2))
+	m2=solve((eq2,eq3))
+	m3=solve((eq3,eq1))
+	a=ret(int(m1[x]),int(m1[y]),int(m2[x]),int(m2[y]))
+	b=ret(int(m2[x]),int(m2[y]),int(m3[x]),int(m3[y]))
+	c=ret(int(m3[x]),int(m3[y]),int(m1[x]),int(m1[y]))
+	s=(a+b+c)/2
+	output=sqrt(s*(s-a)*(s-b)*(s-c))
+	r.sendlineafter('Input :','%0.1f'%output)
+	#r.interactive()
+r.interactive()
